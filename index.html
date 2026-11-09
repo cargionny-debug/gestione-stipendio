@@ -3,274 +3,924 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SmartSalary Pro - Gestione Stipendio</title>
+    <title>Stipendio Smart - Personal Budget Manager</title>
     <!-- Tailwind CSS -->
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- Chart.js -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js per i grafici -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- FontAwesome -->
+    <!-- FontAwesome per le icone -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            900: '#14532d',
+                        },
+                        needs: {
+                            DEFAULT: '#3b82f6',
+                            light: '#eff6ff',
+                            dark: '#1d4ed8'
+                        },
+                        wants: {
+                            DEFAULT: '#8b5cf6',
+                            light: '#f5f3ff',
+                            dark: '#6d28d9'
+                        },
+                        savings: {
+                            DEFAULT: '#10b981',
+                            light: '#ecfdf5',
+                            dark: '#047857'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-      body { font-family: 'Inter', sans-serif; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen pb-12">
+<body class="text-slate-800 antialiased min-h-screen flex flex-col">
 
-    <!-- Header -->
-    <header class="bg-slate-800 border-b border-slate-700 sticky top-0 z-50 shadow-md">
-        <div class="max-w-5xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-3">
-                <div class="bg-emerald-500 text-slate-900 p-2.5 rounded-xl font-bold text-xl shadow-lg shadow-emerald-500/20">
-                    <i class="fa-solid fa-wallet"></i>
+    <!-- Header / Navbar -->
+    <header class="bg-slate-900 text-white sticky top-0 z-50 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-slate-900 font-bold text-xl shadow-lg">
+                    €
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold text-white">SmartSalary Pro</h1>
-                    <p class="text-xs text-slate-400">Gestione Intelligente del Budget</p>
+                    <h1 class="font-bold text-lg leading-tight">StipendioSmart</h1>
+                    <p class="text-xs text-slate-400">Gestione Budget & Risparmio</p>
                 </div>
             </div>
             
-            <div class="flex items-center gap-3">
+            <div class="flex items-center space-x-3">
                 <!-- Pulsante Nuovo Mese -->
-                <button onclick="openNewMonthModal()" class="bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-bold px-3 py-2 rounded-xl text-xs transition flex items-center gap-1.5 shadow-lg shadow-emerald-500/10">
+                <button onclick="openNewMonthModal()" class="text-xs bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-3.5 py-2 rounded-lg transition flex items-center gap-1.5 shadow-sm cursor-pointer">
                     <i class="fa-solid fa-calendar-plus"></i> Chiudi & Nuovo Mese
                 </button>
-                
-                <!-- Stipendio Netto -->
-                <div class="flex items-center gap-2 bg-slate-900/80 px-3 py-2 rounded-xl border border-slate-700">
-                    <span class="text-xs text-slate-400">Stipendio:</span>
-                    <div class="relative flex items-center">
-                        <span class="text-emerald-400 font-semibold mr-1 text-xs">€</span>
-                        <input type="number" id="netSalaryInput" value="1500" class="w-20 bg-transparent font-bold text-white focus:outline-none text-right text-xs" oninput="updateAppData()">
-                    </div>
-                </div>
             </div>
         </div>
     </header>
 
-    <main class="max-w-5xl mx-auto px-4 mt-6 space-y-6">
+    <!-- Content Dashboard -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
-        <!-- Sezione Personalizzazione Percentuali -->
-        <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 shadow-xl">
-            <div class="flex justify-between items-center mb-4 cursor-pointer" onclick="toggleSettings()">
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-sliders text-emerald-400"></i>
-                    <h2 class="font-semibold text-white text-sm sm:text-base">Regola di Allocazione (Personalizzabile)</h2>
+        <!-- Banner Configurazione Stipendio e Percentuali -->
+        <section class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/85">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-6 border-b border-slate-100">
+                <!-- Input Stipendio -->
+                <div class="flex-1">
+                    <label for="salaryInput" class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                        Stipendio Netto Mensile
+                    </label>
+                    <div class="relative max-w-xs">
+                        <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400 font-semibold text-lg">€</span>
+                        <input type="number" id="salaryInput" value="2000" min="0" step="50" onchange="updateSalary(this.value)" onkeyup="updateSalary(this.value)" 
+                               class="w-full pl-9 pr-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-xl font-bold text-slate-900 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition">
+                    </div>
                 </div>
-                <div class="flex items-center gap-3">
-                    <span id="percentStatus" class="text-xs px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 font-medium">Totale: 100%</span>
-                    <button class="text-slate-400 hover:text-white transition"><i class="fa-solid fa-chevron-down" id="settingsChevron"></i></button>
+
+                <!-- Info Totale Ripartito -->
+                <div class="flex items-center space-x-4 bg-slate-50 p-4 rounded-xl border border-slate-100">
+                    <div>
+                        <span class="block text-xs font-medium text-slate-500">Stipendio Totale</span>
+                        <span id="totalSalaryDisplay" class="text-2xl font-extrabold text-slate-900">€ 2.000,00</span>
+                    </div>
+                    <div class="h-8 w-px bg-slate-200"></div>
+                    <div>
+                        <span class="block text-xs font-medium text-slate-500">Totale Percentuali</span>
+                        <span id="totalPercentageDisplay" class="text-2xl font-extrabold text-emerald-600">100%</span>
+                    </div>
                 </div>
             </div>
 
-            <div id="settingsPanel" class="hidden space-y-4 pt-3 border-t border-slate-700/60">
-                <p class="text-xs text-slate-400">Personalizza le percentuali in base alle tue esigenze. La somma deve essere esattamente 100%.</p>
-                
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700">
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="text-xs font-medium text-blue-400">Bisogni Essenziali</span>
-                            <span id="valNeeds" class="font-bold text-sm">50%</span>
-                        </div>
-                        <input type="range" id="sliderNeeds" min="0" max="100" value="50" class="w-full accent-blue-500 cursor-pointer" oninput="adjustPercentages()">
-                    </div>
-                    <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700">
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="text-xs font-medium text-purple-400">Desideri & Svago</span>
-                            <span id="valWants" class="font-bold text-sm">30%</span>
-                        </div>
-                        <input type="range" id="sliderWants" min="0" max="100" value="30" class="w-full accent-purple-500 cursor-pointer" oninput="adjustPercentages()">
-                    </div>
-                    <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700">
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="text-xs font-medium text-emerald-400">Risparmi & Investimenti</span>
-                            <span id="valSavings" class="font-bold text-sm">20%</span>
-                        </div>
-                        <input type="range" id="sliderSavings" min="0" max="100" value="20" class="w-full accent-emerald-500 cursor-pointer" oninput="adjustPercentages()">
-                    </div>
-                </div>
-
-                <div class="flex justify-end gap-2 pt-2">
-                    <button onclick="resetToDefaultPercentages()" class="text-xs bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-1.5 rounded-lg transition">
-                        Ripristina Standard (50/30/20)
+            <!-- Slider Percentuali -->
+            <div class="mt-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-2">
+                        <i class="fa-solid fa-sliders text-emerald-600"></i> Ripartizione Personalizzata delle Percentuali
+                    </h3>
+                    <button onclick="resetPercentages()" class="text-xs text-slate-500 hover:text-emerald-600 underline cursor-pointer">
+                        Ripristina 50/30/20
                     </button>
                 </div>
-            </div>
-        </div>
 
-        <!-- KPI Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="bg-slate-800 border border-slate-700/80 rounded-2xl p-5 shadow-lg relative overflow-hidden">
-                <div class="flex justify-between items-start mb-3">
-                    <span class="text-xs font-semibold uppercase tracking-wider text-blue-400">Bisogni (<span id="dispNeedsPct">50</span>%)</span>
-                    <i class="fa-solid fa-house-chimney text-blue-400/80"></i>
-                </div>
-                <div class="text-2xl font-bold mb-1" id="budgetNeeds">€0.00</div>
-                <div class="text-xs text-slate-400 flex justify-between">
-                    <span>Speso: <strong id="spentNeeds" class="text-slate-200">€0.00</strong></span>
-                    <span id="leftNeeds" class="text-emerald-400">Rimasta: €0.00</span>
-                </div>
-                <div class="w-full bg-slate-700 h-2 rounded-full mt-3 overflow-hidden">
-                    <div id="barNeeds" class="bg-blue-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
-                </div>
-            </div>
-
-            <div class="bg-slate-800 border border-slate-700/80 rounded-2xl p-5 shadow-lg relative overflow-hidden">
-                <div class="flex justify-between items-start mb-3">
-                    <span class="text-xs font-semibold uppercase tracking-wider text-purple-400">Desideri (<span id="dispWantsPct">30</span>%)</span>
-                    <i class="fa-solid fa-champagne-glasses text-purple-400/80"></i>
-                </div>
-                <div class="text-2xl font-bold mb-1" id="budgetWants">€0.00</div>
-                <div class="text-xs text-slate-400 flex justify-between">
-                    <span>Speso: <strong id="spentWants" class="text-slate-200">€0.00</strong></span>
-                    <span id="leftWants" class="text-emerald-400">Rimasta: €0.00</span>
-                </div>
-                <div class="w-full bg-slate-700 h-2 rounded-full mt-3 overflow-hidden">
-                    <div id="barWants" class="bg-purple-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
-                </div>
-            </div>
-
-            <div class="bg-slate-800 border border-slate-700/80 rounded-2xl p-5 shadow-lg relative overflow-hidden">
-                <div class="flex justify-between items-start mb-3">
-                    <span class="text-xs font-semibold uppercase tracking-wider text-emerald-400">Risparmi (<span id="dispSavingsPct">20</span>%)</span>
-                    <i class="fa-solid fa-piggy-bank text-emerald-400/80"></i>
-                </div>
-                <div class="text-2xl font-bold mb-1" id="budgetSavings">€0.00</div>
-                <div class="text-xs text-slate-400 flex justify-between">
-                    <span>Accantonato: <strong id="spentSavings" class="text-slate-200">€0.00</strong></span>
-                    <span id="leftSavings" class="text-emerald-400">Obiettivo Budget</span>
-                </div>
-                <div class="w-full bg-slate-700 h-2 rounded-full mt-3 overflow-hidden">
-                    <div id="barSavings" class="bg-emerald-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Inserimento Spesa & Grafico -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 shadow-xl lg:col-span-1">
-                <h3 class="text-base font-bold text-white mb-4 flex items-center gap-2">
-                    <i class="fa-solid fa-circle-plus text-emerald-400"></i> Aggiungi Transazione
-                </h3>
-                <form id="expenseForm" onsubmit="addExpense(event)" class="space-y-4">
-                    <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1">Descrizione</label>
-                        <input type="text" id="expDesc" required placeholder="Es. Affitto, Spesa Supermercato..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500 transition">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Bisogni Essenziali -->
+                    <div class="bg-blue-50/60 p-4 rounded-xl border border-blue-100 space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="font-semibold text-blue-900 text-sm flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-blue-500 inline-block"></span> Bisogni Essenziali
+                            </span>
+                            <span id="needsPercentText" class="font-bold text-blue-700">50%</span>
+                        </div>
+                        <input type="range" id="needsRange" min="0" max="100" value="50" oninput="handlePercentageChange('needs', this.value)" 
+                               class="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                        <div class="flex justify-between text-xs text-slate-600 pt-1">
+                            <span>Allocato:</span>
+                            <span id="needsAllocatedText" class="font-semibold text-blue-900">€ 1.000,00</span>
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1">Importo (€)</label>
-                        <input type="number" step="0.01" id="expAmount" required placeholder="0.00" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500 transition">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1">Categoria di Budget</label>
-                        <select id="expCategory" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500 transition">
-                            <option value="needs">Bisogni Essenziali (Affitto, bollette, spesa)</option>
-                            <option value="wants">Desideri & Svago (Ristoranti, hobby, shopping)</option>
-                            <option value="savings">Risparmi / Accantonamento</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-bold py-2.5 rounded-xl transition shadow-lg shadow-emerald-500/20 text-sm cursor-pointer">
-                        Registra Spesa
-                    </button>
-                </form>
-            </div>
 
-            <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 shadow-xl lg:col-span-2 flex flex-col justify-between">
+                    <!-- Desideri & Svago -->
+                    <div class="bg-purple-50/60 p-4 rounded-xl border border-purple-100 space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="font-semibold text-purple-900 text-sm flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-purple-500 inline-block"></span> Desideri & Svago
+                            </span>
+                            <span id="wantsPercentText" class="font-bold text-purple-700">30%</span>
+                        </div>
+                        <input type="range" id="wantsRange" min="0" max="100" value="30" oninput="handlePercentageChange('wants', this.value)" 
+                               class="w-full h-2 bg-purple-200 rounded-lg appearance-none cursor-pointer accent-purple-600">
+                        <div class="flex justify-between text-xs text-slate-600 pt-1">
+                            <span>Allocato:</span>
+                            <span id="wantsAllocatedText" class="font-semibold text-purple-900">€ 600,00</span>
+                        </div>
+                    </div>
+
+                    <!-- Risparmi & Investimenti -->
+                    <div class="bg-emerald-50/60 p-4 rounded-xl border border-emerald-100 space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="font-semibold text-emerald-900 text-sm flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span> Risparmi & Inv.
+                            </span>
+                            <span id="savingsPercentText" class="font-bold text-emerald-700">20%</span>
+                        </div>
+                        <input type="range" id="savingsRange" min="0" max="100" value="20" oninput="handlePercentageChange('savings', this.value)" 
+                               class="w-full h-2 bg-emerald-200 rounded-lg appearance-none cursor-pointer accent-emerald-600">
+                        <div class="flex justify-between text-xs text-slate-600 pt-1">
+                            <span>Allocato:</span>
+                            <span id="savingsAllocatedText" class="font-semibold text-emerald-900">€ 400,00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Avviso Somma Percentuali -->
+                <div id="percentageWarning" class="hidden mt-4 p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-xs flex items-center gap-2">
+                    <i class="fa-solid fa-triangle-exclamation text-amber-600"></i>
+                    <span>La somma delle percentuali è <strong id="currentPercentSum">100%</strong>. Assicurati che il totale sia esattamente il 100% per un calcolo accurato.</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sezione Card Monitoraggio Spese vs Budget Allocato -->
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Card Bisogni -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80 flex flex-col justify-between space-y-4">
                 <div>
-                    <h3 class="text-base font-bold text-white mb-4 flex items-center gap-2">
-                        <i class="fa-solid fa-chart-pie text-emerald-400"></i> Distribuzione Spese Mese Attuale
-                    </h3>
-                    <div class="h-64 flex justify-center items-center relative">
-                        <canvas id="expenseChart"></canvas>
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-2.5 py-1 rounded-md">Bisogni Essenziali</span>
+                        <i class="fa-solid fa-house text-slate-400"></i>
+                    </div>
+                    <div class="mt-2">
+                        <span id="needsSpentDisplay" class="text-3xl font-extrabold text-slate-900">€ 0,00</span>
+                        <span id="needsLimitDisplay" class="text-xs text-slate-500 font-medium">/ € 1.000,00</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex justify-between text-xs font-semibold mb-1">
+                        <span id="needsProgressLabel" class="text-slate-600">Utilizzato: 0%</span>
+                        <span id="needsRemainingLabel" class="text-blue-600">Rimanenti: € 1.000,00</span>
+                    </div>
+                    <div class="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
+                        <div id="needsProgressBar" class="h-full bg-blue-500 rounded-full transition-all duration-500" style="width: 0%"></div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Storico Transazioni & Obiettivi -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Storico con Filtro Mese -->
-            <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 shadow-xl">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-base font-bold text-white flex items-center gap-2">
-                        <i class="fa-solid fa-clock-rotate-left text-emerald-400"></i> Storico Spese
-                    </h3>
-                    <select id="monthFilter" onchange="updateUI()" class="bg-slate-900 border border-slate-700 rounded-lg text-xs px-2 py-1 text-slate-300 focus:outline-none">
-                        <!-- Popolato dinamicamente da JS -->
-                    </select>
+            <!-- Card Desideri -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80 flex flex-col justify-between space-y-4">
+                <div>
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-xs font-bold uppercase tracking-wider text-purple-600 bg-purple-50 px-2.5 py-1 rounded-md">Desideri & Svago</span>
+                        <i class="fa-solid fa-gamepad text-slate-400"></i>
+                    </div>
+                    <div class="mt-2">
+                        <span id="wantsSpentDisplay" class="text-3xl font-extrabold text-slate-900">€ 0,00</span>
+                        <span id="wantsLimitDisplay" class="text-xs text-slate-500 font-medium">/ € 600,00</span>
+                    </div>
                 </div>
-                <div class="overflow-y-auto max-h-72 space-y-2 pr-1" id="expenseList"></div>
+                <div>
+                    <div class="flex justify-between text-xs font-semibold mb-1">
+                        <span id="wantsProgressLabel" class="text-slate-600">Utilizzato: 0%</span>
+                        <span id="wantsRemainingLabel" class="text-purple-600">Rimanenti: € 600,00</span>
+                    </div>
+                    <div class="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
+                        <div id="wantsProgressBar" class="h-full bg-purple-500 rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                </div>
             </div>
 
-            <!-- Obiettivi di Risparmio -->
-            <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 shadow-xl flex flex-col justify-between">
+            <!-- Card Risparmi -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80 flex flex-col justify-between space-y-4">
                 <div>
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-base font-bold text-white flex items-center gap-2">
-                            <i class="fa-solid fa-bullseye text-emerald-400"></i> Obiettivi di Risparmio
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-xs font-bold uppercase tracking-wider text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-md">Risparmi & Inv.</span>
+                        <i class="fa-solid fa-piggy-bank text-slate-400"></i>
+                    </div>
+                    <div class="mt-2">
+                        <span id="savingsSpentDisplay" class="text-3xl font-extrabold text-slate-900">€ 0,00</span>
+                        <span id="savingsLimitDisplay" class="text-xs text-slate-500 font-medium">/ € 400,00</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex justify-between text-xs font-semibold mb-1">
+                        <span id="savingsProgressLabel" class="text-slate-600">Versato: 0%</span>
+                        <span id="savingsRemainingLabel" class="text-emerald-600">Rimanenti: € 400,00</span>
+                    </div>
+                    <div class="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
+                        <div id="savingsProgressBar" class="h-full bg-emerald-500 rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Content Area: Form Spese + Grafici e Transazioni -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <!-- Colonna Sinistra: Form Aggiunta Spesa & Grafico Panoramica -->
+            <div class="space-y-6">
+                <!-- Form Nuova Spesa -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80">
+                    <h3 class="font-bold text-slate-900 mb-4 flex items-center gap-2 text-base">
+                        <i class="fa-solid fa-circle-plus text-emerald-600"></i> Aggiungi Nuova Spesa
+                    </h3>
+                    <form id="expenseForm" onsubmit="handleAddExpense(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Descrizione / Titolo</label>
+                            <input type="text" id="expenseTitle" placeholder="Es. Spesa al Supermercato, Affitto..." required 
+                                   class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Importo (€)</label>
+                                <input type="number" id="expenseAmount" step="0.01" min="0.01" placeholder="0.00" required 
+                                       class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Data</label>
+                                <input type="date" id="expenseDate" required 
+                                       class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Categoria di Budget</label>
+                            <select id="expenseCategory" required 
+                                    class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none cursor-pointer">
+                                <option value="needs">Bisogni Essenziali (Affitto, Cibo, Bollette)</option>
+                                <option value="wants">Desideri & Svago (Uscite, Abbonamenti, Hobbies)</option>
+                                <option value="savings">Risparmi & Investimenti (Fondo Emergenza, ETF)</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl transition shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 cursor-pointer">
+                            <i class="fa-solid fa-plus"></i> Registra Spesa
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Grafico a Ciambella -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80">
+                    <h3 class="font-bold text-slate-900 mb-4 flex items-center gap-2 text-base">
+                        <i class="fa-solid fa-chart-pie text-emerald-600"></i> Distribuzione Spese Mese Corrente
+                    </h3>
+                    <div class="relative flex items-center justify-center min-h-[220px]">
+                        <canvas id="budgetChart" class="max-h-[240px]"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Colonna Destra: Elenco Transazioni e Obiettivi di Risparmio -->
+            <div class="lg:col-span-2 space-y-6">
+
+                <!-- Elenco Transazioni con Filtro Mese -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80 flex flex-col">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4 pb-3 border-b border-slate-100">
+                        <h3 class="font-bold text-slate-900 flex items-center gap-2 text-base">
+                            <i class="fa-solid fa-receipt text-emerald-600"></i> Storico Spese & Movimenti
                         </h3>
-                        <button onclick="openGoalModal()" class="text-xs bg-slate-700 hover:bg-slate-600 text-slate-200 px-3 py-1.5 rounded-lg transition">
+                        
+                        <!-- Selettore Mese e Filtro Categoria -->
+                        <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                            <select id="monthFilter" onchange="changeSelectedMonth(this.value)" class="text-xs px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-lg focus:outline-none font-medium text-slate-700 cursor-pointer">
+                                <!-- Popolato via JS -->
+                            </select>
+                            <select id="filterCategory" onchange="renderExpenses()" class="text-xs px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-lg focus:outline-none cursor-pointer">
+                                <option value="all">Tutte le categorie</option>
+                                <option value="needs">Bisogni Essenziali</option>
+                                <option value="wants">Desideri & Svago</option>
+                                <option value="savings">Risparmi & Inv.</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Lista Spese -->
+                    <div class="overflow-y-auto max-h-[350px] custom-scrollbar pr-1">
+                        <ul id="expensesList" class="divide-y divide-slate-100">
+                            <!-- Inserito dinamicamente via JS -->
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Sezione Obiettivi di Risparmio -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80">
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h3 class="font-bold text-slate-900 flex items-center gap-2 text-base">
+                                <i class="fa-solid fa-bullseye text-emerald-600"></i> Obiettivi di Risparmio (Savings Goals)
+                            </h3>
+                            <p class="text-xs text-slate-500">Imposta e monitora i tuoi traguardi finanziari</p>
+                        </div>
+                        <button onclick="toggleGoalForm()" class="text-xs bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-semibold px-3 py-2 rounded-xl transition border border-emerald-200 cursor-pointer">
                             + Nuovo Obiettivo
                         </button>
                     </div>
-                    <div id="goalsList" class="space-y-3 max-h-64 overflow-y-auto pr-1"></div>
+
+                    <!-- Form Nuovo Obiettivo (Nascosto di Default) -->
+                    <form id="goalForm" onsubmit="handleAddGoal(event)" class="hidden mb-6 p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div class="sm:col-span-1">
+                                <label class="block text-xs font-medium text-slate-600 mb-1">Nome Obiettivo</label>
+                                <input type="text" id="goalTitle" placeholder="Es. Fondo Emergenza, Vacanze" required class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 mb-1">Target (€)</label>
+                                <input type="number" id="goalTarget" step="10" placeholder="1000" required class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 mb-1">Attuale (€)</label>
+                                <input type="number" id="goalCurrent" step="10" placeholder="0" value="0" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs">
+                            </div>
+                        </div>
+                        <div class="flex justify-end space-x-2">
+                            <button type="button" onclick="toggleGoalForm()" class="px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-200 rounded-lg cursor-pointer">Annulla</button>
+                            <button type="submit" class="px-3 py-1.5 text-xs bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-700 cursor-pointer">Salva Obiettivo</button>
+                        </div>
+                    </form>
+
+                    <!-- Lista Obiettivi -->
+                    <div id="goalsList" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- Inserito dinamicamente via JS -->
+                    </div>
                 </div>
+
             </div>
+
         </div>
 
     </main>
 
-    <!-- Modale Nuovo Mese / Archiviazione -->
-    <div id="newMonthModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-        <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4">
-            <h3 class="text-lg font-bold text-white">Chiudi Mese & Inizia Nuovo</h3>
-            <p class="text-xs text-slate-400">Archivia le spese correnti e azzera il contatore per il nuovo stipendio. Gli obiettivi di risparmio rimarranno salvati.</p>
+    <!-- Modale Chiusura Mese -->
+    <div id="newMonthModal" class="hidden fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4 border border-slate-100">
+            <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <i class="fa-solid fa-calendar-days text-emerald-600"></i> Chiudi Mese & Inizia Nuovo
+            </h3>
+            <p class="text-xs text-slate-600 leading-relaxed">
+                Questo passerà il budget al nuovo mese azzerando il contatore delle spese correnti. Le spese precedenti rimarranno salvate nell'archivio.
+            </p>
             <div>
-                <label class="block text-xs font-medium text-slate-400 mb-1">Seleziona il mese appena concluso</label>
-                <input type="month" id="archiveMonthName" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500">
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Seleziona il nuovo mese da iniziare</label>
+                <input type="month" id="archiveMonthInput" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
             </div>
             <div class="flex justify-end gap-2 pt-2">
-                <button type="button" onclick="closeNewMonthModal()" class="bg-slate-700 text-slate-300 text-xs px-4 py-2 rounded-xl">Annulla</button>
-                <button type="button" onclick="confirmNewMonth()" class="bg-emerald-500 font-bold text-slate-900 text-xs px-4 py-2 rounded-xl">Archivia e Azzera</button>
+                <button type="button" onclick="closeNewMonthModal()" class="px-4 py-2 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl cursor-pointer">Annulla</button>
+                <button type="button" onclick="confirmNewMonth()" class="px-4 py-2 text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl cursor-pointer">Conferma e Inizia Mese</button>
             </div>
         </div>
     </div>
 
-    <!-- Modale Nuovo Obiettivo -->
-    <div id="goalModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-        <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4">
-            <h3 class="text-lg font-bold text-white">Crea Obiettivo di Risparmio</h3>
-            <form onsubmit="addGoal(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">Nome Obiettivo</label>
-                    <input type="text" id="goalName" required placeholder="Es. Fondo d'Emergenza, Vacanze..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">Cifra Target (€)</label>
-                    <input type="number" step="1" id="goalTarget" required placeholder="1000" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none">
-                </div>
-                <div class="flex justify-end gap-2 pt-2">
-                    <button type="button" onclick="closeGoalModal()" class="bg-slate-700 text-slate-300 text-xs px-4 py-2 rounded-xl">Annulla</button>
-                    <button type="submit" class="bg-emerald-500 font-bold text-slate-900 text-xs px-4 py-2 rounded-xl">Crea</button>
-                </div>
-            </form>
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 mt-12 py-6 text-center text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto px-4">
+            StipendioSmart &copy; 2026 - Gestore di Budget Personale con Regola Flessibile 50/30/20. Dati salvati localmente.
         </div>
-    </div>
+    </footer>
 
-    <!-- Script Logica App -->
+    <!-- LOGICA JAVASCRIPT -->
     <script>
-        let appData = JSON.parse(localStorage.getItem('smartSalaryData')) || {
-            netSalary: 1500,
-            percentages: { needs: 50, wants: 30, savings: 20 },
-            currentMonth: new Date().toISOString().slice(0, 7), // AAAA-MM
+        // Stato Applicazione con Defaults e Mese Corrente
+        let state = {
+            salary: 2000,
+            currentMonth: new Date().toISOString().substring(0, 7), // formato "AAAA-MM"
+            percentages: {
+                needs: 50,
+                wants: 30,
+                savings: 20
+            },
             expenses: [],
             goals: [
-                { id: 1, name: 'Fondo d\'Emergenza', target: 2000, current: 450 },
-                { id: 2, name: 'Vacanze', target: 800, current: 200 }
+                { id: '1', title: 'Fondo d\'Emergenza', target: 3000, current: 1200 },
+                { id: '2', title: 'Vacanze Estive', target: 1500, current: 450 }
             ]
         };
 
-        let expenseChartInstance = null;
+        let chartInstance = null;
 
+        // Inizializzazione al caricamento
+        window.onload = function() {
+            // Imposta la data odierna nel form
+            document.getElementById('expenseDate').value = new Date().toISOString().substring(0, 10);
+
+            // Carica dati da LocalStorage se presenti
+            loadData();
+
+            // Inizializza UI e Grafico
+            updateUI();
+            initChart();
+        };
+
+        // Caricamento Dati
+        function loadData() {
+            const savedState = localStorage.getItem('stipendio_smart_data');
+            if (savedState) {
+                try {
+                    const parsed = JSON.parse(savedState);
+                    state = { ...state, ...parsed };
+                    if (!state.currentMonth) {
+                        state.currentMonth = new Date().toISOString().substring(0, 7);
+                    }
+                } catch (e) {
+                    console.error("Errore durante il recupero dati da localStorage", e);
+                }
+            }
+        }
+
+        // Salvataggio Dati
         function saveData() {
-            localStorage.setItem('smartSalaryData', JSON
+            localStorage.setItem('stipendio_smart_data', JSON.stringify(state));
+        }
+
+        // Aggiorna Stipendio
+        function updateSalary(val) {
+            const num = parseFloat(val);
+            if (!isNaN(num) && num >= 0) {
+                state.salary = num;
+                saveData();
+                updateUI();
+            }
+        }
+
+        // Gestione Cambiamento Percentuali
+        function handlePercentageChange(category, val) {
+            const num = parseInt(val);
+            state.percentages[category] = num;
+
+            // Verifica se la somma fa 100%
+            const total = state.percentages.needs + state.percentages.wants + state.percentages.savings;
+            const warningEl = document.getElementById('percentageWarning');
+            const sumEl = document.getElementById('currentPercentSum');
+
+            if (total !== 100) {
+                warningEl.classList.remove('hidden');
+                sumEl.textContent = total + '%';
+            } else {
+                warningEl.classList.add('hidden');
+            }
+
+            saveData();
+            updateUI();
+        }
+
+        // Ripristina Percentuali standard (50/30/20)
+        function resetPercentages() {
+            state.percentages = { needs: 50, wants: 30, savings: 20 };
+            document.getElementById('needsRange').value = 50;
+            document.getElementById('wantsRange').value = 30;
+            document.getElementById('savingsRange').value = 20;
+            document.getElementById('percentageWarning').classList.add('hidden');
+            saveData();
+            updateUI();
+        }
+
+        // Formattazione Valuta Euro
+        function formatEUR(val) {
+            return new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(val);
+        }
+
+        // Calcola totale speso per categoria nel mese selezionato
+        function getSpentByCategory(category) {
+            return state.expenses
+                .filter(e => {
+                    const expenseMonth = e.month || (e.date ? e.date.substring(0, 7) : state.currentMonth);
+                    return expenseMonth === state.currentMonth && e.category === category;
+                })
+                .reduce((sum, e) => sum + e.amount, 0);
+        }
+
+        // Popola e aggiorna il selettore dei mesi nello storico
+        function populateMonthFilter() {
+            const selectEl = document.getElementById('monthFilter');
+            if (!selectEl) return;
+
+            // Raccogli tutti i mesi unici dalle spese registrate + il mese corrente
+            let months = new Set();
+            months.add(state.currentMonth);
+            state.expenses.forEach(e => {
+                const m = e.month || (e.date ? e.date.substring(0, 7) : null);
+                if (m) months.add(m);
+            });
+
+            // Ordina i mesi dal più recente al meno recente
+            const sortedMonths = Array.from(months).sort().reverse();
+
+            selectEl.innerHTML = sortedMonths.map(m => {
+                // Formatta la stringa "2026-06" in formato leggibile "Giugno 2026"
+                let label = m;
+                try {
+                    const [year, month] = m.split('-');
+                    const dateObj = new Date(year, month - 1, 1);
+                    label = dateObj.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
+                    label = label.charAt(0).toUpperCase() + label.slice(1);
+                } catch(err) {}
+
+                const isCurrent = m === state.currentMonth ? ' (Mese Corrente)' : '';
+                return `<option value="${m}" ${m === state.currentMonth ? 'selected' : ''}>${label}${isCurrent}</option>`;
+            }).join('');
+        }
+
+        // Cambio mese selezionato dal menu a tendina
+        function changeSelectedMonth(val) {
+            state.currentMonth = val;
+            updateUI();
+        }
+
+        // Gestione modale Nuovo Mese
+        function openNewMonthModal() {
+            // Suggerisce di default il mese solare corrente o successivo
+            document.getElementById('archiveMonthInput').value = new Date().toISOString().substring(0, 7);
+            document.getElementById('newMonthModal').classList.remove('hidden');
+        }
+
+        function closeNewMonthModal() {
+            document.getElementById('newMonthModal').classList.add('hidden');
+        }
+
+        function confirmNewMonth() {
+            const inputVal = document.getElementById('archiveMonthInput').value;
+            if (inputVal) {
+                state.currentMonth = inputVal;
+                saveData();
+                closeNewMonthModal();
+                updateUI();
+            }
+        }
+
+        // Aggiorna Interfaccia Utente
+        function updateUI() {
+            // Aggiorna input stipendio se non attivo
+            const salInput = document.getElementById('salaryInput');
+            if (document.activeElement !== salInput) {
+                salInput.value = state.salary;
+            }
+
+            document.getElementById('totalSalaryDisplay').textContent = formatEUR(state.salary);
+
+            // Popola il menu a tendina dei mesi
+            populateMonthFilter();
+
+            // Aggiorna percentuali visive
+            document.getElementById('needsPercentText').textContent = state.percentages.needs + '%';
+            document.getElementById('wantsPercentText').textContent = state.percentages.wants + '%';
+            document.getElementById('savingsPercentText').textContent = state.percentages.savings + '%';
+
+            document.getElementById('needsRange').value = state.percentages.needs;
+            document.getElementById('wantsRange').value = state.percentages.wants;
+            document.getElementById('savingsRange').value = state.percentages.savings;
+
+            const totalPct = state.percentages.needs + state.percentages.wants + state.percentages.savings;
+            document.getElementById('totalPercentageDisplay').textContent = totalPct + '%';
+            document.getElementById('totalPercentageDisplay').className = totalPct === 100 ? 'text-2xl font-extrabold text-emerald-600' : 'text-2xl font-extrabold text-amber-600';
+
+            // Calcolo allocazioni budget in Euro
+            const needsBudget = (state.salary * state.percentages.needs) / 100;
+            const wantsBudget = (state.salary * state.percentages.wants) / 100;
+            const savingsBudget = (state.salary * state.percentages.savings) / 100;
+
+            document.getElementById('needsAllocatedText').textContent = formatEUR(needsBudget);
+            document.getElementById('wantsAllocatedText').textContent = formatEUR(wantsBudget);
+            document.getElementById('savingsAllocatedText').textContent = formatEUR(savingsBudget);
+
+            // Calcolo Spese Effettive del Mese Corrente Selezionato
+            const needsSpent = getSpentByCategory('needs');
+            const wantsSpent = getSpentByCategory('wants');
+            const savingsSpent = getSpentByCategory('savings');
+
+            // Card Bisogni
+            document.getElementById('needsSpentDisplay').textContent = formatEUR(needsSpent);
+            document.getElementById('needsLimitDisplay').textContent = '/ ' + formatEUR(needsBudget);
+            const needsPctUsed = needsBudget > 0 ? Math.min(Math.round((needsSpent / needsBudget) * 100), 100) : 0;
+            const needsRem = needsBudget - needsSpent;
+            document.getElementById('needsProgressLabel').textContent = `Utilizzato: ${Math.round((needsSpent / (needsBudget || 1)) * 100)}%`;
+            document.getElementById('needsRemainingLabel').textContent = needsRem >= 0 ? `Rimanenti: ${formatEUR(needsRem)}` : `Sforato: ${formatEUR(Math.abs(needsRem))}`;
+            document.getElementById('needsProgressBar').style.width = `${Math.min(needsPctUsed, 100)}%`;
+            document.getElementById('needsProgressBar').className = needsSpent > needsBudget ? 'h-full bg-rose-500 rounded-full transition-all duration-500' : 'h-full bg-blue-500 rounded-full transition-all duration-500';
+
+            // Card Desideri
+            document.getElementById('wantsSpentDisplay').textContent = formatEUR(wantsSpent);
+            document.getElementById('wantsLimitDisplay').textContent = '/ ' + formatEUR(wantsBudget);
+            const wantsPctUsed = wantsBudget > 0 ? Math.min(Math.round((wantsSpent / wantsBudget) * 100), 100) : 0;
+            const wantsRem = wantsBudget - wantsSpent;
+            document.getElementById('wantsProgressLabel').textContent = `Utilizzato: ${Math.round((wantsSpent / (wantsBudget || 1)) * 100)}%`;
+            document.getElementById('wantsRemainingLabel').textContent = wantsRem >= 0 ? `Rimanenti: ${formatEUR(wantsRem)}` : `Sforato: ${formatEUR(Math.abs(wantsRem))}`;
+            document.getElementById('wantsProgressBar').style.width = `${Math.min(wantsPctUsed, 100)}%`;
+            document.getElementById('wantsProgressBar').className = wantsSpent > wantsBudget ? 'h-full bg-rose-500 rounded-full transition-all duration-500' : 'h-full bg-purple-500 rounded-full transition-all duration-500';
+
+            // Card Risparmi
+            document.getElementById('savingsSpentDisplay').textContent = formatEUR(savingsSpent);
+            document.getElementById('savingsLimitDisplay').textContent = '/ ' + formatEUR(savingsBudget);
+            const savingsPctUsed = savingsBudget > 0 ? Math.min(Math.round((savingsSpent / savingsBudget) * 100), 100) : 0;
+            const savingsRem = savingsBudget - savingsSpent;
+            document.getElementById('savingsProgressLabel').textContent = `Versato: ${Math.round((savingsSpent / (savingsBudget || 1)) * 100)}%`;
+            document.getElementById('savingsRemainingLabel').textContent = savingsRem >= 0 ? `Rimanenti: ${formatEUR(savingsRem)}` : `Obiettivo Superato!`;
+            document.getElementById('savingsProgressBar').style.width = `${Math.min(savingsPctUsed, 100)}%`;
+
+            // Render Elenco Spese e Obiettivi
+            renderExpenses();
+            renderGoals();
+
+            // Aggiorna Grafico
+            if (chartInstance) {
+                chartInstance.data.datasets[0].data = [needsSpent, wantsSpent, savingsSpent];
+                chartInstance.update();
+            }
+        }
+
+        // Aggiungi Spesa
+        function handleAddExpense(e) {
+            e.preventDefault();
+            const title = document.getElementById('expenseTitle').value.trim();
+            const amount = parseFloat(document.getElementById('expenseAmount').value);
+            const date = document.getElementById('expenseDate').value;
+            const category = document.getElementById('expenseCategory').value;
+
+            if (!title || isNaN(amount) || amount <= 0 || !date) return;
+
+            // Determina il mese di competenza in base alla data inserita
+            const expenseMonth = date.substring(0, 7);
+
+            const newExpense = {
+                id: Date.now().toString(),
+                title,
+                amount,
+                date,
+                category,
+                month: expenseMonth
+            };
+
+            state.expenses.unshift(newExpense); // aggiungi in cima
+            
+            // Se la spesa inserita appartiene a un mese diverso da quello visualizzato, sposta la vista su quel mese
+            state.currentMonth = expenseMonth;
+
+            saveData();
+            updateUI();
+
+            // Reset form (mantiene la data odierna)
+            document.getElementById('expenseTitle').value = '';
+            document.getElementById('expenseAmount').value = '';
+        }
+
+        // Elimina Spesa
+        function deleteExpense(id) {
+            state.expenses = state.expenses.filter(e => e.id !== id);
+            saveData();
+            updateUI();
+        }
+
+        // Render Elenco Spese Filtrate per Mese e Categoria
+        function renderExpenses() {
+            const listEl = document.getElementById('expensesList');
+            const filterCat = document.getElementById('filterCategory').value;
+
+            // Filtra per mese corrente selezionato e categoria
+            const filtered = state.expenses.filter(e => {
+                const expenseMonth = e.month || (e.date ? e.date.substring(0, 7) : state.currentMonth);
+                const matchesMonth = expenseMonth === state.currentMonth;
+                const matchesCat = filterCat === 'all' || e.category === filterCat;
+                return matchesMonth && matchesCat;
+            });
+
+            if (filtered.length === 0) {
+                listEl.innerHTML = `
+                    <li class="py-8 text-center text-slate-400 text-sm">
+                        <i class="fa-regular fa-folder-open text-2xl mb-2 block"></i>
+                        Nessuna spesa registrata per questo mese.
+                    </li>
+                `;
+                return;
+            }
+
+            const categoryBadges = {
+                needs: { text: 'Bisogni', bg: 'bg-blue-100 text-blue-700' },
+                wants: { text: 'Desideri', bg: 'bg-purple-100 text-purple-700' },
+                savings: { text: 'Risparmi', bg: 'bg-emerald-100 text-emerald-700' }
+            };
+
+            listEl.innerHTML = filtered.map(item => `
+                <li class="py-3.5 flex items-center justify-between hover:bg-slate-50/80 px-2 rounded-xl transition">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-9 h-9 rounded-full flex items-center justify-center ${categoryBadges[item.category].bg} font-bold text-xs">
+                            ${item.category === 'needs' ? '<i class="fa-solid fa-house"></i>' : item.category === 'wants' ? '<i class="fa-solid fa-gamepad"></i>' : '<i class="fa-solid fa-piggy-bank"></i>'}
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-slate-800 text-sm">${escapeHtml(item.title)}</h4>
+                            <div class="flex items-center space-x-2 text-xs text-slate-400 mt-0.5">
+                                <span>${formatDate(item.date)}</span>
+                                <span>•</span>
+                                <span class="px-2 py-0.5 rounded text-[10px] font-semibold ${categoryBadges[item.category].bg}">${categoryBadges[item.category].text}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <span class="font-bold text-slate-900 text-sm">- ${formatEUR(item.amount)}</span>
+                        <button onclick="deleteExpense('${item.id}')" title="Elimina" class="text-slate-300 hover:text-rose-500 transition p-1 cursor-pointer">
+                            <i class="fa-regular fa-trash-can"></i>
+                        </button>
+                    </div>
+                </li>
+            `).join('');
+        }
+
+        // Gestione Obiettivi
+        function toggleGoalForm() {
+            const form = document.getElementById('goalForm');
+            form.classList.toggle('hidden');
+        }
+
+        function handleAddGoal(e) {
+            e.preventDefault();
+            const title = document.getElementById('goalTitle').value.trim();
+            const target = parseFloat(document.getElementById('goalTarget').value);
+            const current = parseFloat(document.getElementById('goalCurrent').value) || 0;
+
+            if (!title || isNaN(target) || target <= 0) return;
+
+            state.goals.push({
+                id: Date.now().toString(),
+                title,
+                target,
+                current
+            });
+
+            saveData();
+            updateUI();
+            toggleGoalForm();
+
+            document.getElementById('goalTitle').value = '';
+            document.getElementById('goalTarget').value = '';
+            document.getElementById('goalCurrent').value = '0';
+        }
+
+        function updateGoalAmount(id, delta) {
+            const goal = state.goals.find(g => g.id === id);
+            if (goal) {
+                goal.current = Math.max(0, goal.current + delta);
+                saveData();
+                updateUI();
+            }
+        }
+
+        function deleteGoal(id) {
+            state.goals = state.goals.filter(g => g.id !== id);
+            saveData();
+            updateUI();
+        }
+
+        function renderGoals() {
+            const container = document.getElementById('goalsList');
+
+            if (state.goals.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-2 py-6 text-center text-slate-400 text-sm border border-dashed border-slate-200 rounded-xl">
+                        Nessun obiettivo impostato. Clicca su "+ Nuovo Obiettivo" per aggiungerne uno!
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = state.goals.map(goal => {
+                const pct = Math.min(100, Math.round((goal.current / goal.target) * 100));
+                return `
+                    <div class="p-4 bg-slate-50 border border-slate-200/80 rounded-xl flex flex-col justify-between space-y-3">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="font-bold text-slate-800 text-sm">${escapeHtml(goal.title)}</h4>
+                                <span class="text-xs text-slate-500">${formatEUR(goal.current)} su ${formatEUR(goal.target)}</span>
+                            </div>
+                            <button onclick="deleteGoal('${goal.id}')" class="text-slate-300 hover:text-rose-500 text-xs cursor-pointer">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-xs font-semibold text-slate-600 mb-1">
+                                <span>Avanzamento</span>
+                                <span class="text-emerald-600 font-bold">${pct}%</span>
+                            </div>
+                            <div class="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
+                                <div class="h-full bg-emerald-500 rounded-full transition-all duration-500" style="width: ${pct}%"></div>
+                            </div>
+                        </div>
+                        <div class="flex justify-end space-x-1 pt-1">
+                            <button onclick="updateGoalAmount('${goal.id}', -50)" class="px-2 py-1 bg-white border border-slate-200 text-slate-600 rounded text-xs hover:bg-slate-100 cursor-pointer">-50€</button>
+                            <button onclick="updateGoalAmount('${goal.id}', 50)" class="px-2 py-1 bg-emerald-600 text-white font-medium rounded text-xs hover:bg-emerald-700 cursor-pointer">+50€</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Inizializza Grafico Chart.js
+        function initChart() {
+            const ctx = document.getElementById('budgetChart').getContext('2d');
+            chartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Bisogni Essenziali', 'Desideri & Svago', 'Risparmi & Inv.'],
+                    datasets: [{
+                        data: [
+                            getSpentByCategory('needs'),
+                            getSpentByCategory('wants'),
+                            getSpentByCategory('savings')
+                        ],
+                        backgroundColor: [
+                            '#3b82f6',
+                            '#8b5cf6',
+                            '#10b981'
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: { family: 'Inter', size: 11 },
+                                boxWidth: 12,
+                                usePointStyle: true
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.raw || 0;
+                                    return ' ' + context.label + ': ' + formatEUR(value);
+                                }
+                            }
+                        }
+                    },
+                    cutout: '68%'
+                }
+            });
+        }
+
+        // Funzione Utility per la data
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            const d = new Date(dateStr);
+            return d.toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' });
+        }
+
+        // Security Utility per escape HTML
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
