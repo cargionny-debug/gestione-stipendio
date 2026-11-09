@@ -95,7 +95,7 @@
     <!-- Content Dashboard -->
     <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
-        <!-- Banner Configurazione Stipendio e Percentuali -->
+        <!-- Banner Configurazione Stipendio e Percentuali A Tendina -->
         <section class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/85">
             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-6 border-b border-slate-100">
                 <!-- Input Stipendio -->
@@ -124,71 +124,80 @@
                 </div>
             </div>
 
-            <!-- Slider Percentuali -->
+            <!-- Sezione Tendina Percentuali -->
             <div class="mt-6">
-                <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center justify-between cursor-pointer select-none" onclick="toggleSettings()">
                     <h3 class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-2">
                         <i class="fa-solid fa-sliders text-emerald-600"></i> Ripartizione Personalizzata delle Percentuali
                     </h3>
-                    <button onclick="resetPercentages()" class="text-xs text-slate-500 hover:text-emerald-600 underline cursor-pointer">
-                        Ripristina 50/30/20
-                    </button>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <!-- Bisogni Essenziali -->
-                    <div class="bg-blue-50/60 p-4 rounded-xl border border-blue-100 space-y-3">
-                        <div class="flex justify-between items-center">
-                            <span class="font-semibold text-blue-900 text-sm flex items-center gap-2">
-                                <span class="w-3 h-3 rounded-full bg-blue-500 inline-block"></span> Bisogni Essenziali
-                            </span>
-                            <span id="needsPercentText" class="font-bold text-blue-700">50%</span>
-                        </div>
-                        <input type="range" id="needsRange" min="0" max="100" value="50" oninput="handlePercentageChange('needs', this.value)" 
-                               class="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
-                        <div class="flex justify-between text-xs text-slate-600 pt-1">
-                            <span>Allocato:</span>
-                            <span id="needsAllocatedText" class="font-semibold text-blue-900">€ 1.000,00</span>
-                        </div>
-                    </div>
-
-                    <!-- Desideri & Svago -->
-                    <div class="bg-purple-50/60 p-4 rounded-xl border border-purple-100 space-y-3">
-                        <div class="flex justify-between items-center">
-                            <span class="font-semibold text-purple-900 text-sm flex items-center gap-2">
-                                <span class="w-3 h-3 rounded-full bg-purple-500 inline-block"></span> Desideri & Svago
-                            </span>
-                            <span id="wantsPercentText" class="font-bold text-purple-700">30%</span>
-                        </div>
-                        <input type="range" id="wantsRange" min="0" max="100" value="30" oninput="handlePercentageChange('wants', this.value)" 
-                               class="w-full h-2 bg-purple-200 rounded-lg appearance-none cursor-pointer accent-purple-600">
-                        <div class="flex justify-between text-xs text-slate-600 pt-1">
-                            <span>Allocato:</span>
-                            <span id="wantsAllocatedText" class="font-semibold text-purple-900">€ 600,00</span>
-                        </div>
-                    </div>
-
-                    <!-- Risparmi & Investimenti -->
-                    <div class="bg-emerald-50/60 p-4 rounded-xl border border-emerald-100 space-y-3">
-                        <div class="flex justify-between items-center">
-                            <span class="font-semibold text-emerald-900 text-sm flex items-center gap-2">
-                                <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span> Risparmi & Inv.
-                            </span>
-                            <span id="savingsPercentText" class="font-bold text-emerald-700">20%</span>
-                        </div>
-                        <input type="range" id="savingsRange" min="0" max="100" value="20" oninput="handlePercentageChange('savings', this.value)" 
-                               class="w-full h-2 bg-emerald-200 rounded-lg appearance-none cursor-pointer accent-emerald-600">
-                        <div class="flex justify-between text-xs text-slate-600 pt-1">
-                            <span>Allocato:</span>
-                            <span id="savingsAllocatedText" class="font-semibold text-emerald-900">€ 400,00</span>
-                        </div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs text-slate-500 hover:text-emerald-600 underline">Modifica</span>
+                        <i class="fa-solid fa-chevron-down text-slate-400 transition-transform duration-300" id="settingsChevron"></i>
                     </div>
                 </div>
 
-                <!-- Avviso Somma Percentuali -->
-                <div id="percentageWarning" class="hidden mt-4 p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-xs flex items-center gap-2">
-                    <i class="fa-solid fa-triangle-exclamation text-amber-600"></i>
-                    <span>La somma delle percentuali è <strong id="currentPercentSum">100%</strong>. Assicurati che il totale sia esattamente il 100% per un calcolo accurato.</span>
+                <div id="settingsPanel" class="hidden mt-4 pt-4 border-t border-slate-100 space-y-4">
+                    <div class="flex justify-end">
+                        <button onclick="resetPercentages()" class="text-xs text-slate-500 hover:text-emerald-600 underline cursor-pointer">
+                            Ripristina 50/30/20
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- Bisogni Essenziali -->
+                        <div class="bg-blue-50/60 p-4 rounded-xl border border-blue-100 space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="font-semibold text-blue-900 text-sm flex items-center gap-2">
+                                    <span class="w-3 h-3 rounded-full bg-blue-500 inline-block"></span> Bisogni Essenziali
+                                </span>
+                                <span id="needsPercentText" class="font-bold text-blue-700">50%</span>
+                            </div>
+                            <input type="range" id="needsRange" min="0" max="100" value="50" oninput="handlePercentageChange('needs', this.value)" 
+                                   class="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                            <div class="flex justify-between text-xs text-slate-600 pt-1">
+                                <span>Allocato:</span>
+                                <span id="needsAllocatedText" class="font-semibold text-blue-900">€ 1.000,00</span>
+                            </div>
+                        </div>
+
+                        <!-- Desideri & Svago -->
+                        <div class="bg-purple-50/60 p-4 rounded-xl border border-purple-100 space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="font-semibold text-purple-900 text-sm flex items-center gap-2">
+                                    <span class="w-3 h-3 rounded-full bg-purple-500 inline-block"></span> Desideri & Svago
+                                </span>
+                                <span id="wantsPercentText" class="font-bold text-purple-700">30%</span>
+                            </div>
+                            <input type="range" id="wantsRange" min="0" max="100" value="30" oninput="handlePercentageChange('wants', this.value)" 
+                                   class="w-full h-2 bg-purple-200 rounded-lg appearance-none cursor-pointer accent-purple-600">
+                            <div class="flex justify-between text-xs text-slate-600 pt-1">
+                                <span>Allocato:</span>
+                                <span id="wantsAllocatedText" class="font-semibold text-purple-900">€ 600,00</span>
+                            </div>
+                        </div>
+
+                        <!-- Risparmi & Investimenti -->
+                        <div class="bg-emerald-50/60 p-4 rounded-xl border border-emerald-100 space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="font-semibold text-emerald-900 text-sm flex items-center gap-2">
+                                    <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span> Risparmi & Inv.
+                                </span>
+                                <span id="savingsPercentText" class="font-bold text-emerald-700">20%</span>
+                            </div>
+                            <input type="range" id="savingsRange" min="0" max="100" value="20" oninput="handlePercentageChange('savings', this.value)" 
+                                   class="w-full h-2 bg-emerald-200 rounded-lg appearance-none cursor-pointer accent-emerald-600">
+                            <div class="flex justify-between text-xs text-slate-600 pt-1">
+                                <span>Allocato:</span>
+                                <span id="savingsAllocatedText" class="font-semibold text-emerald-900">€ 400,00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Avviso Somma Percentuali -->
+                    <div id="percentageWarning" class="hidden mt-4 p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-xs flex items-center gap-2">
+                        <i class="fa-solid fa-triangle-exclamation text-amber-600"></i>
+                        <span>La somma delle percentuali è <strong id="currentPercentSum">100%</strong>. Assicurati che il totale sia esattamente il 100% per un calcolo accurato.</span>
+                    </div>
                 </div>
             </div>
         </section>
@@ -431,10 +440,9 @@
 
     <!-- LOGICA JAVASCRIPT -->
     <script>
-        // Stato Applicazione con Defaults e Mese Corrente
         let state = {
             salary: 2000,
-            currentMonth: new Date().toISOString().substring(0, 7), // formato "AAAA-MM"
+            currentMonth: new Date().toISOString().substring(0, 7),
             percentages: {
                 needs: 50,
                 wants: 30,
@@ -449,20 +457,13 @@
 
         let chartInstance = null;
 
-        // Inizializzazione al caricamento
         window.onload = function() {
-            // Imposta la data odierna nel form
             document.getElementById('expenseDate').value = new Date().toISOString().substring(0, 10);
-
-            // Carica dati da LocalStorage se presenti
             loadData();
-
-            // Inizializza UI e Grafico
             updateUI();
             initChart();
         };
 
-        // Caricamento Dati
         function loadData() {
             const savedState = localStorage.getItem('stipendio_smart_data');
             if (savedState) {
@@ -478,12 +479,18 @@
             }
         }
 
-        // Salvataggio Dati
         function saveData() {
             localStorage.setItem('stipendio_smart_data', JSON.stringify(state));
         }
 
-        // Aggiorna Stipendio
+        // Funzione per aprire/chiudere il pannello a tendina delle percentuali
+        function toggleSettings() {
+            const panel = document.getElementById('settingsPanel');
+            const chevron = document.getElementById('settingsChevron');
+            panel.classList.toggle('hidden');
+            chevron.classList.toggle('rotate-180');
+        }
+
         function updateSalary(val) {
             const num = parseFloat(val);
             if (!isNaN(num) && num >= 0) {
@@ -493,12 +500,10 @@
             }
         }
 
-        // Gestione Cambiamento Percentuali
         function handlePercentageChange(category, val) {
             const num = parseInt(val);
             state.percentages[category] = num;
 
-            // Verifica se la somma fa 100%
             const total = state.percentages.needs + state.percentages.wants + state.percentages.savings;
             const warningEl = document.getElementById('percentageWarning');
             const sumEl = document.getElementById('currentPercentSum');
@@ -514,7 +519,6 @@
             updateUI();
         }
 
-        // Ripristina Percentuali standard (50/30/20)
         function resetPercentages() {
             state.percentages = { needs: 50, wants: 30, savings: 20 };
             document.getElementById('needsRange').value = 50;
@@ -525,12 +529,10 @@
             updateUI();
         }
 
-        // Formattazione Valuta Euro
         function formatEUR(val) {
             return new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(val);
         }
 
-        // Calcola totale speso per categoria nel mese selezionato
         function getSpentByCategory(category) {
             return state.expenses
                 .filter(e => {
@@ -540,12 +542,10 @@
                 .reduce((sum, e) => sum + e.amount, 0);
         }
 
-        // Popola e aggiorna il selettore dei mesi nello storico
         function populateMonthFilter() {
             const selectEl = document.getElementById('monthFilter');
             if (!selectEl) return;
 
-            // Raccogli tutti i mesi unici dalle spese registrate + il mese corrente
             let months = new Set();
             months.add(state.currentMonth);
             state.expenses.forEach(e => {
@@ -553,11 +553,9 @@
                 if (m) months.add(m);
             });
 
-            // Ordina i mesi dal più recente al meno recente
             const sortedMonths = Array.from(months).sort().reverse();
 
             selectEl.innerHTML = sortedMonths.map(m => {
-                // Formatta la stringa "2026-06" in formato leggibile "Giugno 2026"
                 let label = m;
                 try {
                     const [year, month] = m.split('-');
@@ -571,15 +569,12 @@
             }).join('');
         }
 
-        // Cambio mese selezionato dal menu a tendina
         function changeSelectedMonth(val) {
             state.currentMonth = val;
             updateUI();
         }
 
-        // Gestione modale Nuovo Mese
         function openNewMonthModal() {
-            // Suggerisce di default il mese solare corrente o successivo
             document.getElementById('archiveMonthInput').value = new Date().toISOString().substring(0, 7);
             document.getElementById('newMonthModal').classList.remove('hidden');
         }
@@ -598,9 +593,7 @@
             }
         }
 
-        // Aggiorna Interfaccia Utente
         function updateUI() {
-            // Aggiorna input stipendio se non attivo
             const salInput = document.getElementById('salaryInput');
             if (document.activeElement !== salInput) {
                 salInput.value = state.salary;
@@ -608,10 +601,8 @@
 
             document.getElementById('totalSalaryDisplay').textContent = formatEUR(state.salary);
 
-            // Popola il menu a tendina dei mesi
             populateMonthFilter();
 
-            // Aggiorna percentuali visive
             document.getElementById('needsPercentText').textContent = state.percentages.needs + '%';
             document.getElementById('wantsPercentText').textContent = state.percentages.wants + '%';
             document.getElementById('savingsPercentText').textContent = state.percentages.savings + '%';
@@ -624,7 +615,6 @@
             document.getElementById('totalPercentageDisplay').textContent = totalPct + '%';
             document.getElementById('totalPercentageDisplay').className = totalPct === 100 ? 'text-2xl font-extrabold text-emerald-600' : 'text-2xl font-extrabold text-amber-600';
 
-            // Calcolo allocazioni budget in Euro
             const needsBudget = (state.salary * state.percentages.needs) / 100;
             const wantsBudget = (state.salary * state.percentages.wants) / 100;
             const savingsBudget = (state.salary * state.percentages.savings) / 100;
@@ -633,12 +623,10 @@
             document.getElementById('wantsAllocatedText').textContent = formatEUR(wantsBudget);
             document.getElementById('savingsAllocatedText').textContent = formatEUR(savingsBudget);
 
-            // Calcolo Spese Effettive del Mese Corrente Selezionato
             const needsSpent = getSpentByCategory('needs');
             const wantsSpent = getSpentByCategory('wants');
             const savingsSpent = getSpentByCategory('savings');
 
-            // Card Bisogni
             document.getElementById('needsSpentDisplay').textContent = formatEUR(needsSpent);
             document.getElementById('needsLimitDisplay').textContent = '/ ' + formatEUR(needsBudget);
             const needsPctUsed = needsBudget > 0 ? Math.min(Math.round((needsSpent / needsBudget) * 100), 100) : 0;
@@ -648,7 +636,6 @@
             document.getElementById('needsProgressBar').style.width = `${Math.min(needsPctUsed, 100)}%`;
             document.getElementById('needsProgressBar').className = needsSpent > needsBudget ? 'h-full bg-rose-500 rounded-full transition-all duration-500' : 'h-full bg-blue-500 rounded-full transition-all duration-500';
 
-            // Card Desideri
             document.getElementById('wantsSpentDisplay').textContent = formatEUR(wantsSpent);
             document.getElementById('wantsLimitDisplay').textContent = '/ ' + formatEUR(wantsBudget);
             const wantsPctUsed = wantsBudget > 0 ? Math.min(Math.round((wantsSpent / wantsBudget) * 100), 100) : 0;
@@ -658,7 +645,6 @@
             document.getElementById('wantsProgressBar').style.width = `${Math.min(wantsPctUsed, 100)}%`;
             document.getElementById('wantsProgressBar').className = wantsSpent > wantsBudget ? 'h-full bg-rose-500 rounded-full transition-all duration-500' : 'h-full bg-purple-500 rounded-full transition-all duration-500';
 
-            // Card Risparmi
             document.getElementById('savingsSpentDisplay').textContent = formatEUR(savingsSpent);
             document.getElementById('savingsLimitDisplay').textContent = '/ ' + formatEUR(savingsBudget);
             const savingsPctUsed = savingsBudget > 0 ? Math.min(Math.round((savingsSpent / savingsBudget) * 100), 100) : 0;
@@ -667,18 +653,15 @@
             document.getElementById('savingsRemainingLabel').textContent = savingsRem >= 0 ? `Rimanenti: ${formatEUR(savingsRem)}` : `Obiettivo Superato!`;
             document.getElementById('savingsProgressBar').style.width = `${Math.min(savingsPctUsed, 100)}%`;
 
-            // Render Elenco Spese e Obiettivi
             renderExpenses();
             renderGoals();
 
-            // Aggiorna Grafico
             if (chartInstance) {
                 chartInstance.data.datasets[0].data = [needsSpent, wantsSpent, savingsSpent];
                 chartInstance.update();
             }
         }
 
-        // Aggiungi Spesa
         function handleAddExpense(e) {
             e.preventDefault();
             const title = document.getElementById('expenseTitle').value.trim();
@@ -688,7 +671,6 @@
 
             if (!title || isNaN(amount) || amount <= 0 || !date) return;
 
-            // Determina il mese di competenza in base alla data inserita
             const expenseMonth = date.substring(0, 7);
 
             const newExpense = {
@@ -700,32 +682,26 @@
                 month: expenseMonth
             };
 
-            state.expenses.unshift(newExpense); // aggiungi in cima
-            
-            // Se la spesa inserita appartiene a un mese diverso da quello visualizzato, sposta la vista su quel mese
+            state.expenses.unshift(newExpense);
             state.currentMonth = expenseMonth;
 
             saveData();
             updateUI();
 
-            // Reset form (mantiene la data odierna)
             document.getElementById('expenseTitle').value = '';
             document.getElementById('expenseAmount').value = '';
         }
 
-        // Elimina Spesa
         function deleteExpense(id) {
             state.expenses = state.expenses.filter(e => e.id !== id);
             saveData();
             updateUI();
         }
 
-        // Render Elenco Spese Filtrate per Mese e Categoria
         function renderExpenses() {
             const listEl = document.getElementById('expensesList');
             const filterCat = document.getElementById('filterCategory').value;
 
-            // Filtra per mese corrente selezionato e categoria
             const filtered = state.expenses.filter(e => {
                 const expenseMonth = e.month || (e.date ? e.date.substring(0, 7) : state.currentMonth);
                 const matchesMonth = expenseMonth === state.currentMonth;
@@ -774,7 +750,6 @@
             `).join('');
         }
 
-        // Gestione Obiettivi
         function toggleGoalForm() {
             const form = document.getElementById('goalForm');
             form.classList.toggle('hidden');
@@ -862,7 +837,6 @@
             }).join('');
         }
 
-        // Inizializza Grafico Chart.js
         function initChart() {
             const ctx = document.getElementById('budgetChart').getContext('2d');
             chartInstance = new Chart(ctx, {
@@ -910,14 +884,12 @@
             });
         }
 
-        // Funzione Utility per la data
         function formatDate(dateStr) {
             if (!dateStr) return '';
             const d = new Date(dateStr);
             return d.toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' });
         }
 
-        // Security Utility per escape HTML
         function escapeHtml(str) {
             return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
         }
