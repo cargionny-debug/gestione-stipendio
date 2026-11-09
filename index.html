@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stipendio Smart - Personal Budget Manager</title>
+    
+    <!-- Link PWA Manifest -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#0f172a">
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js per i grafici -->
@@ -483,7 +488,6 @@
             localStorage.setItem('stipendio_smart_data', JSON.stringify(state));
         }
 
-        // Funzione per aprire/chiudere il pannello a tendina delle percentuali
         function toggleSettings() {
             const panel = document.getElementById('settingsPanel');
             const chevron = document.getElementById('settingsChevron');
@@ -894,12 +898,16 @@
             return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
         }
     </script>
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js')
-      .then(() => console.log('Service Worker registrato con successo'))
-      .catch((err) => console.log('Errore Service Worker:', err));
-  }
-</script>
+
+    <!-- Registrazione Service Worker per abilitare l'installazione dell'App -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js')
+            .then(() => console.log('Service Worker registrato con successo'))
+            .catch((err) => console.log('Errore Service Worker:', err));
+        });
+      }
+    </script>
 </body>
 </html>
